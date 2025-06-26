@@ -5,3 +5,5 @@ scikit-learn
 PyMuPDF
 jinja2
 python-dotenv
+requests
+pandas

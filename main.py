@@ -4,16 +4,10 @@ from fastapi.templating import Jinja2Templates
 import os
 import fitz  # PyMuPDF
 import openai
+import requests
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from dotenv import load_dotenv
-import os
-
-load_dotenv()  # Load from .env file
-openai.api_key = os.getenv("OPENAI_API_KEY")
-
-# === CONFIG ===
-PDF_PATH = "C:/Users/garim/Downloads/The+48+Laws+Of+Power.pdf"
 
 # === INIT ===
 print("🔧 Initializing FastAPI app...")
@@ -21,15 +15,22 @@ app = FastAPI()
 templates = Jinja2Templates(directory="templates")
 
 print("🔐 Setting up OpenAI client...")
-openai.api_key = os.getenv("OPENAI_API_KEY")  # ✅ Uses environment variable
+load_dotenv()
+openai.api_key = os.getenv("OPENAI_API_KEY")
+
+# === CONFIG ===
+PDF_URL = "https://drive.google.com/uc?export=download&id=1-bL9VRo-9FjxA1OZ5rGk7o_lhlW0lhlr"
 
 # === STEP 1: Load and process PDF ===
-def extract_chunks_from_pdf(file_path, chunk_size=500):
-    print(f"📄 Opening PDF from: {file_path}")
+def extract_chunks_from_drive(pdf_url, chunk_size=500):
     try:
-        with fitz.open(file_path) as doc:
-            full_text = "\n".join([page.get_text() for page in doc])
-        print("✅ PDF read successfully.")
+        print("📄 Downloading PDF from Google Drive...")
+        response = requests.get(pdf_url)
+        response.raise_for_status()
+
+        pdf = fitz.open(stream=response.content, filetype="pdf")
+        full_text = "\n".join([page.get_text() for page in pdf])
+        print("✅ PDF downloaded and read successfully.")
     except Exception as e:
         print(f"❌ Failed to read PDF: {e}")
         return []
@@ -40,7 +41,7 @@ def extract_chunks_from_pdf(file_path, chunk_size=500):
     return chunks
 
 print("🔍 Extracting and preparing data from PDF...")
-chunks = extract_chunks_from_pdf(PDF_PATH)
+chunks = extract_chunks_from_drive(PDF_URL)
 
 if chunks:
     print("🔡 Creating TF-IDF vectors for chunks...")
