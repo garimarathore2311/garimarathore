@@ -3,11 +3,11 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 import os
 import fitz  # PyMuPDF
-import openai
 import requests
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from dotenv import load_dotenv
+from openai import OpenAI
 
 # === INIT ===
 print("🔧 Initializing FastAPI app...")
@@ -16,7 +16,7 @@ templates = Jinja2Templates(directory="templates")
 
 print("🔐 Setting up OpenAI client...")
 load_dotenv()
-openai.api_key = os.getenv("OPENAI_API_KEY")
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 # === CONFIG ===
 PDF_URL = "https://drive.google.com/uc?export=download&id=1-bL9VRo-9FjxA1OZ5rGk7o_lhlW0lhlr"
@@ -71,7 +71,7 @@ async def ask_question(request: Request, question: str = Form(...)):
 
     print("🧾 Sending prompt to OpenAI...")
     try:
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model="gpt-4",
             messages=[
                 {"role": "system", "content": "Answer using the provided context only."},
