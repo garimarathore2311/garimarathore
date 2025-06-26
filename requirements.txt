@@ -4,3 +4,4 @@ openai
 scikit-learn
 PyMuPDF
 jinja2
+python-dotenv
