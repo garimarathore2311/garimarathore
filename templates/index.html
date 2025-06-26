@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>PDF Chatbot</title>
+</head>
+<body>
+  <h2>📘 Ask About "The 48 Laws of Power"</h2>
+  <form action="/ask" method="post">
+    <input name="question" style="width: 400px;" placeholder="Ask your question here">
+    <button type="submit">Ask</button>
+  </form>
+
+  {% if question %}
+    <h3>Your Question:</h3>
+    <p>{{ question }}</p>
+  {% endif %}
+
+  {% if answer %}
+    <h3>Answer:</h3>
+    <p>{{ answer }}</p>
+  {% endif %}
+
+  {% if error %}
+    <p style="color:red">{{ error }}</p>
+  {% endif %}
+</body>
+</html>
